@@ -1,0 +1,45 @@
+name: Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Nothing here writes back to the repo.
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Evaluation only: every option, assertion and warning in all ten starters,
+  # without downloading the desktops. The weekly update job builds the VMs.
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      # Actions are pinned to commit hashes; the comment gives the release each one matches.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: cachix/install-nix-action@91f6a0f59e94dfb2cfed0f4000f36a68ead1d20c # v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: No em or en dashes
+        run: |
+          if grep -rnP "[\x{2013}\x{2014}]" --exclude-dir=.git .; then
+            echo "Found an em or en dash. Reword it." >&2
+            exit 1
+          fi
+
+      - name: Formatting
+        run: nix fmt -- --ci
+
+      - name: Root flake (templates and apps)
+        run: nix flake check --print-build-logs
+
+      - name: Every starter, and the same pint
+        run: ci/check-all.sh

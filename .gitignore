@@ -1,0 +1,16 @@
+# Nix
+result
+result-*
+.direnv/
+
+# Test VM disks, in case diskImage is ever switched back on
+*.qcow2
+
+# Editors / OS
+.DS_Store
+.vscode/
+*.swp
+
+# Local assistant notes (not published)
+CLAUDE.md
+.claude/

@@ -1,0 +1,64 @@
+name: Update lock files
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays, 06:00 UTC
+  workflow_dispatch:
+
+# Pushes a branch and opens a pull request. For that to work, the repo needs
+# Settings > Actions > General > "Allow GitHub Actions to create and approve
+# pull requests" switched on.
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-lock-files
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      # Actions are pinned to commit hashes; the comment gives the release each one matches.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: cachix/install-nix-action@91f6a0f59e94dfb2cfed0f4000f36a68ead1d20c # v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      # The VMs need about 15 GB; the runner's preinstalled toolchains are
+      # in the way.
+      - name: Make room
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h /
+
+      # Each starter has its own flake.lock, because `nix flake init` copies
+      # it to the reader. den stays on its pinned release tag.
+      - name: Update every lock file
+        run: |
+          nix flake update --flake path:.
+          for dir in templates/*/; do
+            if [[ -e $dir/flake.nix ]]; then
+              (cd "$dir" && nix flake update --flake path:.)
+            fi
+          done
+          git diff --stat
+
+      # Pull requests opened with the built-in token don't trigger check.yml,
+      # so the checks run here, and the VMs get built as well.
+      - name: Check every starter and build every VM
+        run: BUILD=1 ci/check-all.sh
+
+      - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          branch: update-lock-files
+          delete-branch: true
+          commit-message: "chore: Updated the lock files."
+          title: "Update the lock files"
+          body: |
+            The weekly update of every `flake.lock`, made by `.github/workflows/update.yml`.
+
+            Before opening this, the job checked all ten starters (evaluation, the placeholder guard and the same-pint comparison) and built every test VM.
