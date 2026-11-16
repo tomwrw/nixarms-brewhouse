@@ -24,6 +24,8 @@ nix run github:tomwrw/nixarms-brewhouse#vanilla-hm
 
 That boots this config in a throwaway virtual machine, logged in as `alice` (the password is `changeme`). Close the window when you're done. Nothing is saved, and nothing on your computer changes.
 
+On Windows, or to rehearse the whole install first, [the guide on nixarms.com](https://nixarms.com/brewhouse/starters/vanilla/) walks you through trying it in VirtualBox.
+
 ## Make it yours
 
 This starter replaces your `configuration.nix`, so keep a copy of the old one first.
@@ -50,31 +52,41 @@ This starter replaces your `configuration.nix`, so keep a copy of the old one fi
 4. Search for `CHANGE ME` and fill in your details. They're in the block at the top of `configuration.nix`, and your git name and email are in `home.nix`.
    - Use the account name you picked in the installer. A new name means a new, empty account.
    - Copy `stateVersion` from your old `configuration.nix`.
-5. Put them in place, keeping your own `hardware-configuration.nix`:
+5. Bring across your PC's own lines. The installer put a few settings in `/etc/nixos/configuration.nix` that belong to your PC alone, and this starter replaces that file. This finds them:
+
+   ```sh
+   grep -nE "boot\.loader|boot\.initrd" /etc/nixos/configuration.nix
+   ```
+
+   - `boot.loader.grub` lines mean your PC starts up with GRUB, as older PCs do. Use them in place of the starter's two `boot.loader` lines.
+   - `boot.initrd.luks` or `boot.initrd.secrets` lines unlock an encrypted disk. Copy them in as they are. Without them, parts of your disk may not unlock.
+
+   If you only see `systemd-boot` and `efi`, the starter has those already.
+6. Put them in place, keeping your own `hardware-configuration.nix`:
 
    ```sh
    sudo cp configuration.nix home.nix /etc/nixos/
    ```
 
-6. Try it in a VM before you switch. From your home folder:
+7. Try it in a VM before you switch. From your home folder:
 
    ```sh
-   nixos-rebuild build-vm && ./result/bin/run-snug-vm
+   nixos-rebuild build-vm && ./result/bin/run-*-vm
    ```
 
-7. Switch to it:
+8. Switch to it:
 
    ```sh
    sudo nixos-rebuild switch
    ```
 
-From then on, edit the files in `/etc/nixos`, then run step 7 again. If a change goes wrong, pick the previous generation from the boot menu and you're back where you were.
+From then on, edit the files in `/etc/nixos`, then run step 8 again. If a change goes wrong, pick the previous generation from the boot menu and you're back where you were.
 
-Home Manager won't overwrite dotfiles you already have, such as `~/.bashrc`. It renames each one to `*.backup` and puts its own in place.
+Home Manager won't overwrite dotfiles you already have, such as `~/.bashrc`. It renames each one to `*.backup` and puts its own in place. If a `*.backup` file is already there, the switch stops with "would be clobbered": move the old backup somewhere else and switch again.
 
 ## Keeping it up to date
 
-`sudo nixos-rebuild switch --upgrade` fetches the latest fixes for both channels and switches to them. When you move to a new NixOS release, move the Home Manager channel to the matching release too.
+`sudo nixos-rebuild switch --upgrade-all` fetches the latest fixes for both channels and switches to them. Plain `--upgrade` only updates the NixOS channel, so Home Manager would fall behind. When you move to a new NixOS release, move the Home Manager channel to the matching release too.
 
 ## Next step
 

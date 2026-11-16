@@ -32,6 +32,10 @@ nix run .#vm
 
 That boots this config in a throwaway virtual machine, logged in as `alice` (the password is `changeme`). Close the window when you're done. Nothing is saved, and nothing on your computer changes.
 
+On a fresh NixOS, flakes aren't switched on until you've switched to this starter, so until then use `nix --extra-experimental-features "nix-command flakes" run .#vm`.
+
+On Windows, or to rehearse the whole install first, [the guide on nixarms.com](https://nixarms.com/brewhouse/starters/dendritic/) walks you through trying it in VirtualBox.
+
 ## Make it yours
 
 1. Copy in your computer's own hardware file, over the placeholder. Keep the `_` at the start of its name:
@@ -45,15 +49,25 @@ That boots this config in a throwaway virtual machine, logged in as `alice` (the
    - your account in `modules/users/alice.nix`. Use the account name you picked in the installer; a new name means a new, empty account;
    - the hostname and `stateVersion` in `modules/hosts/snug/default.nix`. If you change the hostname, rename the `snug` folder too. Copy `stateVersion` from the `configuration.nix` the installer gave you;
    - your account name again in `modules/vm.nix`, for the VM's automatic login.
-3. If this folder is a git repo, run `git add .` first. Flakes only see files git knows about, and import-tree only loads what the flake can see.
-4. Try your own copy in the VM: `nix run .#vm`
-5. Switch to it:
+3. Bring across your PC's own lines. The installer put a few settings in `/etc/nixos/configuration.nix` that belong to your PC alone, and this starter replaces that file. This finds them:
+
+   ```sh
+   grep -nE "boot\.loader|boot\.initrd" /etc/nixos/configuration.nix
+   ```
+
+   - `boot.loader.grub` lines mean your PC starts up with GRUB, as older PCs do. Put them in `snug`'s own block at the bottom of `modules/hosts/snug/default.nix`, and delete the two `boot.loader` lines from `modules/base.nix`, which every machine shares.
+   - `boot.initrd.luks` or `boot.initrd.secrets` lines unlock an encrypted disk. Copy them into that same block as they are. Without them, parts of your disk may not unlock.
+
+   If you only see `systemd-boot` and `efi`, the starter has those already.
+4. If this folder is a git repo, run `git add .` first. Flakes only see files git knows about, and import-tree only loads what the flake can see.
+5. Try your own copy in the VM: `nix run .#vm` (with the long flag from [Try it](#try-it), on a fresh NixOS)
+6. Switch to it:
 
    ```sh
    sudo nixos-rebuild switch --flake .#snug
    ```
 
-From then on, edit, then run step 5 again. If a change goes wrong, pick the previous generation from the boot menu and you're back where you were.
+From then on, edit, then run step 6 again. If a change goes wrong, pick the previous generation from the boot menu and you're back where you were. Always keep the `--flake .#snug`: without it, `nixos-rebuild` builds the old config in `/etc/nixos` instead.
 
 ## Keeping it up to date
 

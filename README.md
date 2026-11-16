@@ -25,6 +25,8 @@ The Brewhouse is a ladder. Start at the top, and only climb when the step you're
 
 Not sure? You don't need any of this on day one. Start with `vanilla`, which is the config the NixOS installer gives you, filled in. Home Manager is optional at every step; [the Brewhouse](https://nixarms.com/brewhouse/) explains what it's for.
 
+Each method has a step-by-step guide on nixarms.com, covering both its starters and the things that catch newcomers out: [the starter guides](https://nixarms.com/brewhouse/starters/).
+
 ## Try one
 
 You can boot any starter in a throwaway virtual machine, without changing anything on your computer:
@@ -39,7 +41,7 @@ If Nix says flakes aren't switched on, add `--extra-experimental-features "nix-c
 
 Before you start, the honest limits:
 
-- You need Linux on an ordinary (x86_64) PC, with Nix installed. It won't run on a Mac or on Windows.
+- You need Linux on an ordinary (x86_64) PC, with Nix installed. It won't run on a Mac or on Windows. On Windows, [the guides](https://nixarms.com/brewhouse/starters/) walk you through a dress rehearsal instead: install NixOS in VirtualBox, then pour a starter onto it.
 - The first run downloads about 4 GB. The other starters reuse nearly all of it.
 - It's far quicker with hardware virtualisation (KVM). Without it, the VM still works, slowly.
 - Steam installs, but don't expect games to run well in a VM.
@@ -49,9 +51,12 @@ Before you start, the honest limits:
 For the flake starters (steps 2 to 5), in an empty folder:
 
 ```sh
-nix flake init -t github:tomwrw/nixarms-brewhouse#flakes-hm
+nix --extra-experimental-features "nix-command flakes" \
+  flake init -t github:tomwrw/nixarms-brewhouse#flakes-hm
 cp /etc/nixos/hardware-configuration.nix .
 ```
+
+A fresh NixOS hasn't switched flakes on yet, hence the long flag. Every flake starter switches them on for good.
 
 Then search for `CHANGE ME`, fill in your details, and switch:
 
@@ -66,7 +71,9 @@ A few things that catch people out:
 - **Each starter's `hardware-configuration.nix` is a placeholder.** It lets the test VM boot, and it stops a real build with a reminder until you copy your own over it. From flake-parts on, it lives with the rest of the computer's files: `hosts/snug/hardware-configuration.nix` in flake-parts, and `modules/hosts/snug/_hardware-configuration.nix` in dendritic and den.
 - **Use the account name you picked in the installer.** Change `alice` to a name that doesn't exist yet and NixOS makes a new, empty account with the password `changeme`. If that happens, change the password with `passwd` straight away.
 - **Copy `stateVersion` from your old `configuration.nix`.** It records the release you first installed, not the one you run, so don't change it after that.
-- **If your config folder is a git repo, `git add` new files before you build.** Flakes only see files git knows about.
+- **Bring across your PC's own lines.** The installer puts a few machine-only settings in `configuration.nix`, not the hardware file: GRUB on older PCs, and the lines that unlock an encrypted disk (`boot.initrd.luks`, `boot.initrd.secrets`). The starters replace that file, so copy those lines across before you switch. `grep -nE "boot\.loader|boot\.initrd" /etc/nixos/configuration.nix` finds them.
+- **If your config folder is a git repo, `git add` new files before you build.** Flakes only see files git knows about. Git itself arrives with the starters, so on a fresh NixOS, set the repo up after your first switch.
+- **Keep the `--flake .#snug`.** Once you're on a flake starter, a plain `sudo nixos-rebuild switch` builds the old config in `/etc/nixos` instead.
 
 ## What's in this repo
 

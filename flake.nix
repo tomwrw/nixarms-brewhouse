@@ -101,13 +101,17 @@
             1. Copy in your computer's own hardware file:
                `cp /etc/nixos/hardware-configuration.nix ${s.hardware or "."}`
             2. Search for `CHANGE ME` and fill in your own details.
-            3. Switch to it: `sudo nixos-rebuild switch --flake .#snug`
+            3. Bring across any GRUB or disk-encryption lines from
+               /etc/nixos/configuration.nix. README.md shows where they go.
+            4. Switch to it: `sudo nixos-rebuild switch --flake .#snug`
 
             To try it first, `nix run .#vm` boots it in a throwaway virtual machine.
+            On a fresh NixOS, add `--extra-experimental-features "nix-command flakes"`
+            straight after `nix` until you've switched.
             If this folder is a git repo, `git add` every file before you build.
 
-            README.md here has the full guide.
-            More on this method: https://nixarms.com/brewhouse/${s.slug}/
+            README.md here has the full steps.
+            The guide, gotchas and all: https://nixarms.com/brewhouse/starters/${s.slug}/
           ''
         else
           ''
@@ -118,18 +122,20 @@
 
             1. Back up your current config: `sudo cp -r /etc/nixos /etc/nixos.bak`
             2. Search for `CHANGE ME` and fill in your own details.
-            3. Copy the .nix files here into /etc/nixos, but keep your own
+            3. Bring across any GRUB or disk-encryption lines from your old
+               configuration.nix.
+            4. Copy the .nix files here into /etc/nixos, but keep your own
                hardware-configuration.nix.
             ${
               if s.withHomeManager then
                 ''
-                  4. Add the Home Manager channel (README.md has the commands).
-                  5. Switch to it: `sudo nixos-rebuild switch`''
+                  5. Add the Home Manager channel (README.md has the commands).
+                  6. Switch to it: `sudo nixos-rebuild switch`''
               else
-                "4. Switch to it: `sudo nixos-rebuild switch`"
+                "5. Switch to it: `sudo nixos-rebuild switch`"
             }
 
-            More on this method: https://nixarms.com/brewhouse/${s.slug}/
+            The guide, gotchas and all: https://nixarms.com/brewhouse/starters/${s.slug}/
           '';
 
       # `nix run .#<name>` builds that starter's test VM and boots it. Each
@@ -176,6 +182,7 @@
           ${lib.concatMapStringsSep "\n" (s: "  ${padRight 16 s.name}${describe s}") starters}
 
           The guide to each method: https://nixarms.com/brewhouse/
+          Step by step, gotchas and all: https://nixarms.com/brewhouse/starters/
           EOF
         '';
       };

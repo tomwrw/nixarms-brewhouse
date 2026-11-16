@@ -23,6 +23,8 @@ nix run github:tomwrw/nixarms-brewhouse#vanilla
 
 That boots this config in a throwaway virtual machine, logged in as `alice` (the password is `changeme`). Close the window when you're done. Nothing is saved, and nothing on your computer changes.
 
+On Windows, or to rehearse the whole install first, [the guide on nixarms.com](https://nixarms.com/brewhouse/starters/vanilla/) walks you through trying it in VirtualBox.
+
 ## Make it yours
 
 This starter replaces your `configuration.nix`, so keep a copy of the old one first.
@@ -42,25 +44,35 @@ This starter replaces your `configuration.nix`, so keep a copy of the old one fi
 3. Search for `CHANGE ME` and fill in your details. They're all in the block at the top.
    - Use the account name you picked in the installer. A new name means a new, empty account.
    - Copy `stateVersion` from your old `configuration.nix`.
-4. Put it in place, keeping your own `hardware-configuration.nix`:
+4. Bring across your PC's own lines. The installer put a few settings in `/etc/nixos/configuration.nix` that belong to your PC alone, and this starter replaces that file. This finds them:
+
+   ```sh
+   grep -nE "boot\.loader|boot\.initrd" /etc/nixos/configuration.nix
+   ```
+
+   - `boot.loader.grub` lines mean your PC starts up with GRUB, as older PCs do. Use them in place of the starter's two `boot.loader` lines.
+   - `boot.initrd.luks` or `boot.initrd.secrets` lines unlock an encrypted disk. Copy them in as they are. Without them, parts of your disk may not unlock.
+
+   If you only see `systemd-boot` and `efi`, the starter has those already.
+5. Put it in place, keeping your own `hardware-configuration.nix`:
 
    ```sh
    sudo cp configuration.nix /etc/nixos/configuration.nix
    ```
 
-5. Try it in a VM before you switch. From your home folder:
+6. Try it in a VM before you switch. From your home folder:
 
    ```sh
-   nixos-rebuild build-vm && ./result/bin/run-snug-vm
+   nixos-rebuild build-vm && ./result/bin/run-*-vm
    ```
 
-6. Switch to it:
+7. Switch to it:
 
    ```sh
    sudo nixos-rebuild switch
    ```
 
-From then on, edit `/etc/nixos/configuration.nix`, then run step 6 again. If a change goes wrong, pick the previous generation from the boot menu and you're back where you were.
+From then on, edit `/etc/nixos/configuration.nix`, then run step 7 again. If a change goes wrong, pick the previous generation from the boot menu and you're back where you were.
 
 ## Keeping it up to date
 
