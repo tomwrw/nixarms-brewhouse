@@ -13,14 +13,14 @@ It builds exactly the same computer as the [`flakes`](https://github.com/tomwrw/
 | `flake.nix` | Pins NixOS 26.05, flake-parts, import-tree and den, then loads everything in `modules/`. |
 | `flake.lock` | The exact versions in use, written by Nix. You don't edit it by hand. |
 | `modules/den.nix` | Switches den on, with its hostname battery (a ready-made aspect). |
-| `modules/hosts.nix` | Every computer and who uses it, and what the computer called `snug` includes. |
+| `modules/hosts/snug/default.nix` | The computer called `snug`: who uses it, and what it includes. A second computer would be a second folder in `modules/hosts/`. |
+| `modules/hosts/snug/_hardware-configuration.nix` | A placeholder, until you swap in your own. The `_` stops import-tree loading it by itself, so only `snug` uses it. |
 | `modules/aspects/base.nix` | What every machine gets: booting, networking, language and Nix. |
 | `modules/aspects/desktop.nix` | KDE Plasma, sound and printing. |
 | `modules/aspects/apps.nix` | Apps for everyone on the computer. |
 | `modules/aspects/gaming.nix` | Steam. |
 | `modules/aspects/vm.nix` | Settings for the test VM, and `nix run .#vm`. |
 | `modules/users/alice.nix` | You: your account and your own apps. |
-| `hardware-configuration.nix` | A placeholder, until you swap in your own. It sits outside `modules/` so it isn't loaded automatically. |
 
 ## Try it
 
@@ -32,15 +32,15 @@ That boots this config in a throwaway virtual machine, logged in as `alice` (the
 
 ## Make it yours
 
-1. Copy in your computer's own hardware file, over the placeholder:
+1. Copy in your computer's own hardware file, over the placeholder. Keep the `_` at the start of its name:
 
    ```sh
-   cp /etc/nixos/hardware-configuration.nix .
+   cp /etc/nixos/hardware-configuration.nix modules/hosts/snug/_hardware-configuration.nix
    ```
 
 2. Search for `CHANGE ME` and fill in your details:
-   - your hostname and account name in `modules/hosts.nix`. den uses those names everywhere, so rename `den.aspects.snug` and `modules/users/alice.nix` to match. Use the account name you picked in the installer; a new name means a new, empty account;
-   - `stateVersion` in `modules/hosts.nix`. Copy it from the `configuration.nix` the installer gave you;
+   - your hostname and account name in `modules/hosts/snug/default.nix`. den uses those names everywhere, so rename `den.aspects.snug`, the `snug` folder and `modules/users/alice.nix` to match. Use the account name you picked in the installer; a new name means a new, empty account;
+   - `stateVersion` in `modules/hosts/snug/default.nix`. Copy it from the `configuration.nix` the installer gave you;
    - language and keyboard in `modules/aspects/base.nix`;
    - your account name again in `modules/aspects/vm.nix`, for the VM's automatic login.
 3. If this folder is a git repo, run `git add .` first. Flakes only see files git knows about, and import-tree only loads what the flake can see.

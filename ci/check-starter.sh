@@ -97,7 +97,14 @@ fi
 say "3. take it: nix flake init, add hardware, evaluate the real system"
 mkdir "$work/reader"
 (cd "$work/reader" && nix flake init -t "path:${root// /%20}#$name" >/dev/null 2>&1)
-cp -f "$root/ci/hardware-configuration.nix" "$work/reader/hardware-configuration.nix"
+# Most starters keep the placeholder at the top; den keeps it in its host's
+# folder. Find it by its reminder, as a reader would by its comment.
+mapfile -t placeholders < <(grep -rl "still the Brewhouse placeholder" "$work/reader")
+if ((${#placeholders[@]} != 1)); then
+  say "expected one placeholder hardware file, found ${#placeholders[@]}"
+  exit 1
+fi
+cp -f "$root/ci/hardware-configuration.nix" "${placeholders[0]}"
 quietly real_system "$work/reader" >"$work/system"
 
 cat "$work/system"

@@ -64,6 +64,8 @@
           step = 5;
           title = "den";
           usesFlakes = true;
+          # den keeps each computer's files together, in its host's folder.
+          hardware = "modules/hosts/snug/_hardware-configuration.nix";
         }
       ];
 
@@ -93,7 +95,7 @@
             # You've poured the ${s.name} starter
 
             1. Copy in your computer's own hardware file:
-               `cp /etc/nixos/hardware-configuration.nix .`
+               `cp /etc/nixos/hardware-configuration.nix ${s.hardware or "."}`
             2. Search for `CHANGE ME` and fill in your own details.
             3. Switch to it: `sudo nixos-rebuild switch --flake .#snug`
 

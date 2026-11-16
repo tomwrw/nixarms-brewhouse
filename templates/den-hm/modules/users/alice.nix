@@ -1,5 +1,5 @@
 # You. den hands the `user` class to users.users.alice, and the homeManager
-# class to Home Manager, on every computer you're listed on in hosts.nix.
+# class to Home Manager, on every computer you're listed on in modules/hosts/.
 {
   den.aspects.alice = {
     user = {

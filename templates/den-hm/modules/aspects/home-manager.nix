@@ -1,5 +1,6 @@
 # den switches Home Manager on by itself for any user with the homeManager
-# class (see hosts.nix). This aspect only picks how it behaves.
+# class (see modules/hosts/snug/default.nix). This aspect only picks how it
+# behaves.
 {
   den.aspects.home-manager.nixos.home-manager = {
     useGlobalPkgs = true; # share the system's packages, so there's one version of each

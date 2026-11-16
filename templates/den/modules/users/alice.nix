@@ -1,5 +1,5 @@
 # You. Whatever goes in the `user` class, den hands to users.users.alice on
-# every computer you're listed on in hosts.nix.
+# every computer you're listed on in modules/hosts/.
 {
   den.aspects.alice.user =
     { pkgs, ... }:
