@@ -12,11 +12,13 @@ It builds exactly the same computer as the [`flakes-hm`](https://github.com/tomw
 | --- | --- |
 | `flake.nix` | Pins NixOS 26.05, the matching Home Manager and flake-parts, then lists the modules below. |
 | `flake.lock` | The exact versions in use, written by Nix. You don't edit it by hand. |
-| `hosts/snug.nix` | The computer called `snug`, with Home Manager added. A second computer would be a second file here. |
 | `vm.nix` | Gives you `nix run .#vm`. One job, one file: that's the point of flake-parts. |
-| `configuration.nix` | The computer itself: desktop, system apps and your account. Your details are in the block at the top. |
-| `home.nix` | Your corner of it: your apps, git and your shell, through Home Manager. |
-| `hardware-configuration.nix` | A placeholder, until you swap in your own. |
+| `home.nix` | You, through Home Manager: your apps, git and your shell. It sits outside `hosts/`, so every computer can share it. |
+| `hosts/snug/default.nix` | Hands the computer called `snug` to the flake, with Home Manager added. It's a flake-parts module, so it describes the flake, not the computer. |
+| `hosts/snug/configuration.nix` | The computer itself: desktop, system apps and your account. Your details are in the block at the top. |
+| `hosts/snug/hardware-configuration.nix` | A placeholder, until you swap in your own. |
+
+Everything that belongs to `snug` is in its folder. To add a computer, copy that folder within `hosts/`, then in the copy change the name in `default.nix` and `configuration.nix`, swap in that computer's own hardware file, and add the new folder to `flake.nix`'s imports. The new computer picks up `home.nix` as it is.
 
 ## Try it
 
@@ -31,10 +33,10 @@ That boots this config in a throwaway virtual machine, logged in as `alice` (the
 1. Copy in your computer's own hardware file, over the placeholder:
 
    ```sh
-   cp /etc/nixos/hardware-configuration.nix .
+   cp /etc/nixos/hardware-configuration.nix hosts/snug/hardware-configuration.nix
    ```
 
-2. Search for `CHANGE ME` and fill in your details. Most are at the top of `configuration.nix`, and your git name and email are in `home.nix`. If you change the hostname, rename `snug` in `hosts/snug.nix` and `vm.nix` too.
+2. Search for `CHANGE ME` and fill in your details. Most are at the top of `hosts/snug/configuration.nix`, and your git name and email are in `home.nix`. If you change the hostname, rename `snug` in `hosts/snug/default.nix` and `vm.nix` too, rename the `snug` folder, and update its path in `flake.nix`.
    - Use the account name you picked in the installer. A new name means a new, empty account.
    - Copy `stateVersion` from the `configuration.nix` the installer gave you.
 3. If this folder is a git repo, run `git add .` first. Flakes only see files git knows about.
@@ -55,4 +57,4 @@ Home Manager won't overwrite dotfiles you already have, such as `~/.bashrc`. It 
 
 ## Next step
 
-flake-parts tidies the flake, but `configuration.nix` is still one file per machine. [The dendritic pattern](https://nixarms.com/brewhouse/dendritic/) organises by feature instead. The [`dendritic-hm`](https://github.com/tomwrw/nixarms-brewhouse/tree/main/templates/dendritic-hm) starter builds this exact computer that way.
+flake-parts tidies the flake, but each computer still has its own `configuration.nix`, so anything two computers share gets copied into both. [The dendritic pattern](https://nixarms.com/brewhouse/dendritic/) organises by feature instead. The [`dendritic-hm`](https://github.com/tomwrw/nixarms-brewhouse/tree/main/templates/dendritic-hm) starter builds this exact computer that way.

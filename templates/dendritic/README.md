@@ -18,11 +18,11 @@ It builds exactly the same computer as the [`flakes`](https://github.com/tomwrw/
 | `modules/apps.nix` | Apps for everyone on the computer. |
 | `modules/gaming.nix` | Steam. |
 | `modules/users/alice.nix` | You: your account and your own apps. |
-| `modules/hosts/snug.nix` | The computer called `snug`: its list of features, and the facts that are its alone. |
+| `modules/hosts/snug/default.nix` | The computer called `snug`: its list of features, and the facts that are its alone. |
+| `modules/hosts/snug/_hardware-configuration.nix` | A placeholder, until you swap in your own. The `_` stops import-tree loading it by itself, so only `snug` uses it. |
 | `modules/vm.nix` | Settings for the test VM, and `nix run .#vm`. |
-| `hardware-configuration.nix` | A placeholder, until you swap in your own. It sits outside `modules/` so it isn't loaded automatically. |
 
-To add a feature, add a file to `modules/` and put its name in the host's list. You never have to register the file anywhere.
+To add a feature, add a file to `modules/` and put its name in the host's list. You never have to register the file anywhere. To add a computer, add a folder to `modules/hosts/` with its own `default.nix` and `_hardware-configuration.nix`.
 
 ## Try it
 
@@ -34,16 +34,16 @@ That boots this config in a throwaway virtual machine, logged in as `alice` (the
 
 ## Make it yours
 
-1. Copy in your computer's own hardware file, over the placeholder:
+1. Copy in your computer's own hardware file, over the placeholder. Keep the `_` at the start of its name:
 
    ```sh
-   cp /etc/nixos/hardware-configuration.nix .
+   cp /etc/nixos/hardware-configuration.nix modules/hosts/snug/_hardware-configuration.nix
    ```
 
 2. Search for `CHANGE ME` and fill in your details. They're spread out on purpose, each one in the feature it belongs to:
    - language and keyboard in `modules/base.nix`;
    - your account in `modules/users/alice.nix`. Use the account name you picked in the installer; a new name means a new, empty account;
-   - the hostname and `stateVersion` in `modules/hosts/snug.nix`. Copy `stateVersion` from the `configuration.nix` the installer gave you;
+   - the hostname and `stateVersion` in `modules/hosts/snug/default.nix`. If you change the hostname, rename the `snug` folder too. Copy `stateVersion` from the `configuration.nix` the installer gave you;
    - your account name again in `modules/vm.nix`, for the VM's automatic login.
 3. If this folder is a git repo, run `git add .` first. Flakes only see files git knows about, and import-tree only loads what the flake can see.
 4. Try your own copy in the VM: `nix run .#vm`

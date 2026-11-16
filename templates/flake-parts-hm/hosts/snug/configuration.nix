@@ -1,10 +1,11 @@
-# The whole computer, in one file: desktop, apps and your account.
-# hosts/snug.nix builds the machine from it, and flake.nix pins the versions.
-{ pkgs, ... }:
+# The whole computer called snug, in one file, as in the flakes starter.
+# default.nix, next door, hands it to the flake; this file decides what the
+# computer is. Your own apps and settings are in home.nix, at the top.
+{ ... }:
 
 let
   # CHANGE ME: everything personal lives in this block.
-  hostname = "snug"; # also rename it in hosts/snug.nix
+  hostname = "snug"; # also rename it in default.nix, next door
   username = "alice"; # use the account name you picked in the installer
   fullName = "Alice";
   timezone = "Europe/London";
@@ -55,17 +56,20 @@ in
       "wheel"
     ];
     initialPassword = "changeme";
+  };
 
-    # Apps just for you.
-    packages = [
-      pkgs.libreoffice-qt
-      pkgs.vlc
-    ];
+  # Home Manager looks after your own apps and settings. They're in home.nix,
+  # at the top of this config rather than in snug's folder, so every computer
+  # you add can share them.
+  home-manager = {
+    useGlobalPkgs = true; # share the system's packages, so there's one version of each
+    useUserPackages = true;
+    backupFileExtension = "backup"; # keeps any dotfiles you already have as *.backup
+    users.${username}.imports = [ ../../home.nix ];
   };
 
   # Apps for everyone on the computer.
   programs.firefox.enable = true;
-  programs.git.enable = true;
 
   # The pint: Steam. It isn't free software, so NixOS needs your say-so first.
   nixpkgs.config.allowUnfree = true;

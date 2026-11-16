@@ -1,6 +1,6 @@
 # flake-parts splits a flake into modules, so each job gets its own file
 # instead of one long flake.nix. This file only lists the inputs and the
-# modules; hosts/snug.nix and vm.nix do the work.
+# modules; hosts/snug/default.nix and vm.nix do the work.
 {
   description = "The Nix Arms Brewhouse: the flake-parts starter";
 
@@ -14,7 +14,7 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" ];
       imports = [
-        ./hosts/snug.nix
+        ./hosts/snug/default.nix
         ./vm.nix
       ];
     };

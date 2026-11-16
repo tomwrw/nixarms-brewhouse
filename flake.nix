@@ -52,19 +52,23 @@
           step = 3;
           title = "flake-parts";
           usesFlakes = true;
+          # Keeps each computer's files together, in its host's folder.
+          hardware = "hosts/snug/hardware-configuration.nix";
         }
         {
           slug = "dendritic";
           step = 4;
           title = "The dendritic pattern";
           usesFlakes = true;
+          # Keeps each computer's files together, in its host's folder.
+          hardware = "modules/hosts/snug/_hardware-configuration.nix";
         }
         {
           slug = "den";
           step = 5;
           title = "den";
           usesFlakes = true;
-          # den keeps each computer's files together, in its host's folder.
+          # Keeps each computer's files together, in its host's folder.
           hardware = "modules/hosts/snug/_hardware-configuration.nix";
         }
       ];

@@ -63,7 +63,7 @@ The vanilla starters have no flake, so they replace the files in `/etc/nixos` in
 
 A few things that catch people out:
 
-- **Each starter's `hardware-configuration.nix` is a placeholder.** It lets the test VM boot, and it stops a real build with a reminder until you copy your own over it. The den starters keep it with the rest of the computer's files, as `modules/hosts/snug/_hardware-configuration.nix`.
+- **Each starter's `hardware-configuration.nix` is a placeholder.** It lets the test VM boot, and it stops a real build with a reminder until you copy your own over it. From flake-parts on, it lives with the rest of the computer's files: `hosts/snug/hardware-configuration.nix` in flake-parts, and `modules/hosts/snug/_hardware-configuration.nix` in dendritic and den.
 - **Use the account name you picked in the installer.** Change `alice` to a name that doesn't exist yet and NixOS makes a new, empty account with the password `changeme`. If that happens, change the password with `passwd` straight away.
 - **Copy `stateVersion` from your old `configuration.nix`.** It records the release you first installed, not the one you run, so don't change it after that.
 - **If your config folder is a git repo, `git add` new files before you build.** Flakes only see files git knows about.

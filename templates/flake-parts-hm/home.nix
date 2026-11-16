@@ -1,6 +1,7 @@
 # Your own corner of the computer: the apps and settings that belong to you
 # rather than to the whole system. Home Manager reads this file;
-# configuration.nix points it here.
+# hosts/snug/configuration.nix points it here. It sits at the top, outside
+# hosts/, so every computer you add can share it.
 { pkgs, ... }:
 {
   # Apps just for you.

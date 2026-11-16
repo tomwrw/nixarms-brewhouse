@@ -12,10 +12,12 @@ It builds exactly the same computer as the [`flakes`](https://github.com/tomwrw/
 | --- | --- |
 | `flake.nix` | Pins NixOS 26.05 and flake-parts, then lists the modules below. |
 | `flake.lock` | The exact versions in use, written by Nix. You don't edit it by hand. |
-| `hosts/snug.nix` | The computer called `snug`. A second computer would be a second file here. |
 | `vm.nix` | Gives you `nix run .#vm`. One job, one file: that's the point of flake-parts. |
-| `configuration.nix` | The computer itself: desktop, apps and your account. Your details are in the block at the top. |
-| `hardware-configuration.nix` | A placeholder, until you swap in your own. |
+| `hosts/snug/default.nix` | Hands the computer called `snug` to the flake. It's a flake-parts module, so it describes the flake, not the computer. |
+| `hosts/snug/configuration.nix` | The computer itself: desktop, apps and your account. Your details are in the block at the top. |
+| `hosts/snug/hardware-configuration.nix` | A placeholder, until you swap in your own. |
+
+Everything that belongs to `snug` is in its folder. To add a computer, copy that folder within `hosts/`, then in the copy change the name in `default.nix` and `configuration.nix`, swap in that computer's own hardware file, and add the new folder to `flake.nix`'s imports.
 
 ## Try it
 
@@ -30,10 +32,10 @@ That boots this config in a throwaway virtual machine, logged in as `alice` (the
 1. Copy in your computer's own hardware file, over the placeholder:
 
    ```sh
-   cp /etc/nixos/hardware-configuration.nix .
+   cp /etc/nixos/hardware-configuration.nix hosts/snug/hardware-configuration.nix
    ```
 
-2. Search for `CHANGE ME` and fill in your details. Most are at the top of `configuration.nix`. If you change the hostname, rename `snug` in `hosts/snug.nix` and `vm.nix` too.
+2. Search for `CHANGE ME` and fill in your details. Most are at the top of `hosts/snug/configuration.nix`. If you change the hostname, rename `snug` in `hosts/snug/default.nix` and `vm.nix` too, rename the `snug` folder, and update its path in `flake.nix`.
    - Use the account name you picked in the installer. A new name means a new, empty account.
    - Copy `stateVersion` from the `configuration.nix` the installer gave you.
 3. If this folder is a git repo, run `git add .` first. Flakes only see files git knows about.
@@ -52,4 +54,4 @@ From then on, edit, then run step 5 again. If a change goes wrong, pick the prev
 
 ## Next step
 
-flake-parts tidies the flake, but `configuration.nix` is still one file per machine. [The dendritic pattern](https://nixarms.com/brewhouse/dendritic/) organises by feature instead. The [`dendritic`](https://github.com/tomwrw/nixarms-brewhouse/tree/main/templates/dendritic) starter builds this exact computer that way.
+flake-parts tidies the flake, but each computer still has its own `configuration.nix`, so anything two computers share gets copied into both. [The dendritic pattern](https://nixarms.com/brewhouse/dendritic/) organises by feature instead. The [`dendritic`](https://github.com/tomwrw/nixarms-brewhouse/tree/main/templates/dendritic) starter builds this exact computer that way.
