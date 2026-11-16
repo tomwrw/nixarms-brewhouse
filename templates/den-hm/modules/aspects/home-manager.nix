@@ -2,9 +2,13 @@
 # class (see modules/hosts/snug/default.nix). This aspect only picks how it
 # behaves.
 {
-  den.aspects.home-manager.nixos.home-manager = {
-    useGlobalPkgs = true; # share the system's packages, so there's one version of each
-    useUserPackages = true;
-    backupFileExtension = "backup"; # keeps any dotfiles you already have as *.backup
+  den.aspects.home-manager = {
+    nixos = {
+      home-manager = {
+        useGlobalPkgs = true; # share the system's packages, so there's one version of each
+        useUserPackages = true;
+        backupFileExtension = "backup"; # keeps any dotfiles you already have as *.backup
+      };
+    };
   };
 }

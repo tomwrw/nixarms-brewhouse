@@ -19,6 +19,8 @@ It builds exactly the same computer as the [`flakes`](https://github.com/tomwrw/
 
 Everything that belongs to `snug` is in its folder. To add a computer, copy that folder within `hosts/`, then in the copy change the name in `default.nix` and `configuration.nix`, swap in that computer's own hardware file, and add the new folder to `flake.nix`'s imports.
 
+To give the flake another job, such as a dev shell or a formatter, add a file next to `vm.nix` and list it in `flake.nix`'s imports.
+
 ## Try it
 
 ```sh

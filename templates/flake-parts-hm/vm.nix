@@ -3,5 +3,7 @@
 # one computer, so it sits outside hosts/.
 { self, ... }:
 {
+  # CHANGE ME: if you rename snug, rename it here too. To try one of your other
+  # computers in the VM, put its name here instead.
   perSystem.packages.vm = self.nixosConfigurations.snug.config.system.build.vm;
 }

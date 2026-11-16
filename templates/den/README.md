@@ -13,7 +13,7 @@ It builds exactly the same computer as the [`flakes`](https://github.com/tomwrw/
 | `flake.nix` | Pins NixOS 26.05, flake-parts, import-tree and den, then loads everything in `modules/`. |
 | `flake.lock` | The exact versions in use, written by Nix. You don't edit it by hand. |
 | `modules/den.nix` | Switches den on, with its hostname battery (a ready-made aspect). |
-| `modules/hosts/snug/default.nix` | The computer called `snug`: who uses it, and what it includes. A second computer would be a second folder in `modules/hosts/`. |
+| `modules/hosts/snug/default.nix` | The computer called `snug`: who uses it, and what it includes. |
 | `modules/hosts/snug/_hardware-configuration.nix` | A placeholder, until you swap in your own. The `_` stops import-tree loading it by itself, so only `snug` uses it. |
 | `modules/aspects/base.nix` | What every machine gets: booting, networking, language and Nix. |
 | `modules/aspects/desktop.nix` | KDE Plasma, sound and printing. |
@@ -21,6 +21,8 @@ It builds exactly the same computer as the [`flakes`](https://github.com/tomwrw/
 | `modules/aspects/gaming.nix` | Steam. |
 | `modules/aspects/vm.nix` | Settings for the test VM, and `nix run .#vm`. |
 | `modules/users/alice.nix` | You: your account and your own apps. |
+
+To add a feature, add a file to `modules/aspects/` and put it in the host's `includes`. To add a computer, add a folder to `modules/hosts/` with its own `default.nix` and `_hardware-configuration.nix`; its `default.nix` says who uses it and what it includes, as `snug`'s does. Anyone listed on two computers gets the same account and apps on both.
 
 ## Try it
 
